@@ -26,33 +26,71 @@ openSUSE.d_clean:
 
 CLEAN_DEPS+=openSUSE.d_clean
 
-gfxboot.d: defaults
-	inkscape -w 800 -e tmp.png gfxboot/startup.svg
+openSUSE/gfxboot/data-boot/back.jpg: gfxboot/startup.svg
+	inkscape -w 800 -e startup.png gfxboot/startup.svg
 	mkdir -p openSUSE/gfxboot/data-boot/
-	gm convert -quality 100 -interlace None -colorspace YCbCr -sampling-factor 2x2 tmp.png openSUSE/gfxboot/data-boot/back.jpg
-	inkscape -w 800 -e tmp.png gfxboot/install.svg
+	gm convert -quality 100 -interlace None -colorspace YCbCr -sampling-factor 2x2 startup.png openSUSE/gfxboot/data-boot/back.jpg
+	rm -f startup.png
+
+GFXBOOT_DEPS+=openSUSE/gfxboot/data-boot/back.jpg
+
+openSUSE/gfxboot/data-install/back.jpg: gfxboot/install.svg
+	inkscape -w 800 -e install.png gfxboot/install.svg
 	mkdir -p openSUSE/gfxboot/data-install
-	gm convert -quality 100 -interlace None -colorspace YCbCr -sampling-factor 2x2 tmp.png openSUSE/gfxboot/data-install/back.jpg
-	inkscape -w 800 -e tmp.png gfxboot/welcome.svg
-	gm convert -quality 100 -interlace None -colorspace YCbCr -sampling-factor 2x2 tmp.png openSUSE/gfxboot/data-install/welcome.jpg
+	gm convert -quality 100 -interlace None -colorspace YCbCr -sampling-factor 2x2 install.png openSUSE/gfxboot/data-install/back.jpg
+	rm -f install.png
+
+GFXBOOT_DEPS+=openSUSE/gfxboot/data-install/back.jpg
+
+openSUSE/gfxboot/data-install/welcome.jpg: gfxboot/welcome.svg
+	inkscape -w 800 -e welcome.png gfxboot/welcome.svg
+	mkdir -p openSUSE/gfxboot/data-install
+	gm convert -quality 100 -interlace None -colorspace YCbCr -sampling-factor 2x2 welcome.png openSUSE/gfxboot/data-install/welcome.jpg
+	rm -f welcome.png
+
+GFXBOOT_DEPS+=openSUSE/gfxboot/data-install/welcome.jpg
+
+openSUSE/gfxboot/data-install/text.jpg: gfxboot/text.svg
 	mkdir -p ~/.fonts
 	cp gfxboot/FifthLeg-Heavy-Cyrillic.otf ~/.fonts
-	inkscape -D -w 114 -e tmp.png gfxboot/text.svg
+	inkscape -D -w 114 -e text.png gfxboot/text.svg
 	rm ~/.fonts/FifthLeg-Heavy-Cyrillic.otf
-	gm convert -quality 100 -interlace None -colorspace YCbCr -sampling-factor 2x2 tmp.png openSUSE/gfxboot/data-install/text.jpg
-	rm tmp.png
+	mkdir -p openSUSE/gfxboot/data-install
+	gm convert -quality 100 -interlace None -colorspace YCbCr -sampling-factor 2x2 text.png openSUSE/gfxboot/data-install/text.jpg
+	rm -f text.png
+
+GFXBOOT_DEPS+=openSUSE/gfxboot/data-install/text.jpg
+
+gfxboot.d: defaults ${GFXBOOT_DEPS}
 
 gfxboot.d_clean:
 	rm -rf openSUSE/gfxboot
 
 CLEAN_DEPS+=gfxboot.d_clean
 
-grub2.d:
+openSUSE/grub2/backgrounds/default-1610.png: grub2-1610.svg
 	mkdir -p openSUSE/grub2/backgrounds
 	inkscape -w 1920 -C -e openSUSE/grub2/backgrounds/default-1610.png grub2-1610.svg
+
+GRUB2_DEPS+=openSUSE/grub2/backgrounds/default-1610.png
+
+openSUSE/grub2/backgrounds/default-169.png: grub2-169.svg
+	mkdir -p openSUSE/grub2/backgrounds
 	inkscape -w 1920 -C -e openSUSE/grub2/backgrounds/default-169.png grub2-169.svg
+
+GRUB2_DEPS+=openSUSE/grub2/backgrounds/default-169.png
+
+openSUSE/grub2/backgrounds/default-54.png: grub2-54.svg
 	inkscape -w 1280 -C -e openSUSE/grub2/backgrounds/default-54.png grub2-54.svg
+
+GRUB2_DEPS+=openSUSE/grub2/backgrounds/default-54.png
+
+openSUSE/grub2/backgrounds/default-43.png: grub2-43.svg
 	inkscape -w 1600 -C -e openSUSE/grub2/backgrounds/default-43.png grub2-43.svg
+
+GRUB2_DEPS+=openSUSE/grub2/backgrounds/default-169.png
+
+grub2.d: ${GRUB2_DEPS}
 	cp -a boot/grub2/theme openSUSE/grub2/
 	./boot/grub2-branding.sh openSUSE/grub2/backgrounds
 
@@ -116,7 +154,7 @@ plymouth.d_clean:
 
 CLEAN_DEPS+=plymouth.d_clean
 
-kdelibs.d: defaults
+kdelibs.d:
 	mkdir -p openSUSE/kdelibs
 	cp kdelibs/body-background.jpg kdelibs/css.diff openSUSE/kdelibs
 
@@ -125,11 +163,14 @@ kdelibs.d_clean:
 
 CLEAN_DEPS+=kdelibs.d_clean
 
-yast.d:
 #	create directly the background from the 4:3 root's blank background
+openSUSE/yast_wizard/background.png: blank-background-43.svg
+	mkdir -p openSUSE/yast_wizard
+	inkscape -w 1600 -C -e openSUSE/yast_wizard/background.png blank-background-43.svg
+
+yast.d:
 	mkdir -p openSUSE/yast_wizard
 	cp -a yast/* openSUSE/yast_wizard
-	inkscape -w 1600 -C -e openSUSE/yast_wizard/background.png blank-background-43.svg
 	rm -f openSUSE/yast_wizard/*.svg
 
 yast.d_clean:
@@ -195,12 +236,18 @@ defaults_clean:
 
 CLEAN_DEPS+=defaults_clean
 
-ksplashx.d: defaults
+openSUSE/ksplashx/1920x1200/opensuse-logo.png: logo.svg
+	mkdir -p openSUSE/ksplashx/1920x1200
+	inkscape -w 260 --export-id=Geeko -C -j -e openSUSE/ksplashx/1920x1200/opensuse-logo.png logo.svg
+
+openSUSE/ksplashx/Preview.png: default-1920x1200.jpg
+	mkdir -p openSUSE/ksplashx
+	convert -geometry 300x250 default-1920x1200.jpg openSUSE/ksplashx/Preview.png
+
+ksplashx.d: openSUSE/ksplashx/1920x1200/opensuse-logo.png openSUSE/ksplashx/Preview.png
 	mkdir -p openSUSE/ksplashx
 	sed "s:@VERSION@:${VERSION}:g" ksplashx/Theme.rc.in > openSUSE/ksplashx/Theme.rc
 	cp -a ksplashx/1920x1200 openSUSE/ksplashx/
-	inkscape -w 260 --export-id=Geeko -C -j -e openSUSE/ksplashx/1920x1200/opensuse-logo.png logo.svg
-	convert -geometry 300x250 default-1920x1200.jpg openSUSE/ksplashx/Preview.png
 
 ksplashx.d_clean:
 	rm -rf openSUSE/ksplashx
@@ -208,7 +255,7 @@ ksplashx.d_clean:
 CLEAN_DEPS+=ksplashx.d_clean
 
 #This is called openSUSE
-kdm.d: defaults
+kdm.d:
 	mkdir -p openSUSE/kdm/themes/openSUSE
 	cp -a kdm/* openSUSE/kdm/themes/openSUSE
 	#Keep the source but don't package it
@@ -272,18 +319,23 @@ gnome.d_clean:
 
 CLEAN_DEPS+=gnome.d_clean
 
-susegreeter.d:
+openSUSE/SUSEgreeter/background.png: kde-workspace/SUSEgreeter/background.svg
 	mkdir -p openSUSE/SUSEgreeter
 	inkscape -w 800 -e openSUSE/SUSEgreeter/background.png kde-workspace/SUSEgreeter/background.svg
+
+susegreeter.d: openSUSE/SUSEgreeter/background.png
 
 susegreeter.d_clean:
 	rm -rf openSUSE/SUSEgreeter
 
 CLEAN_DEPS+=susegreeter.d_clean
 
-xfce.d:
+openSUSE/xfce/splash.png: xfce/splash.svg
 	mkdir -p openSUSE/xfce
 	inkscape -w 350 -e openSUSE/xfce/splash.png xfce/splash.svg
+
+xfce.d: openSUSE/xfce/splash.png
+	mkdir -p openSUSE/xfce
 	cp xfce/COPYING openSUSE/xfce/COPYING
 
 xfce.d_clean:
@@ -291,9 +343,11 @@ xfce.d_clean:
 
 CLEAN_DEPS+=xfce.d_clean
 
-gimp.d:
+openSUSE/gimp/splash.png: gimp/splash.svg
 	mkdir -p openSUSE/gimp
 	inkscape -w 300 -e openSUSE/gimp/splash.png gimp/splash.svg
+
+gimp.d: openSUSE/gimp/splash.png
 
 gimp.d_clean:
 	rm -rf openSUSE/gimp
